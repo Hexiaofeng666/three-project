@@ -63,6 +63,10 @@ loader.load( 'wonder_woman.glb', function ( gltf ) {
 // mesh2.position.set(120, 0, 0) //设置mesh3模型对象的xyz坐标为120,0,0
 // scene.add(mesh2)
 
+// 环境光
+const light2 = new THREE.AmbientLight(0x523318, 1); // soft white light
+scene.add(light2);
+
 //添加光源 //会照亮场景里的全部物体（氛围灯），前提是物体是可以接受灯光的，这种灯是无方向的，即不会有阴影。
 const ambient = new THREE.AmbientLight(0xffffff, 0.4)
 const light = new THREE.PointLight(0xffffff, 1) //点光源，color:灯光颜色，intensity:光照强度
@@ -107,6 +111,11 @@ onBeforeUnmount(()=>{
   }
 )
 window.addEventListener('keyup',()=>{
+  if (timer.value!=null) {
+    timer.value = null
+  }
+  console.log(timer.value);
+  
   timer.value = setInterval(()=>{
     people.value.scene.position.z += 0.1;
     people.value.scene.updateMatrix();
