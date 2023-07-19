@@ -111,6 +111,7 @@ scene.add(axesHelper)
 //创建一个WebGL渲染器
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(width, height) //设置渲染区尺寸
+renderer.setClearColor(0xffffff, 1) // 设置背景颜色为白色
 renderer.render(scene, camera) //执行渲染操作、指定场景、相机作为参数
 
 const controls = new OrbitControls(camera, renderer.domElement) //创建控件对象
@@ -127,20 +128,64 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(timer.value)
 })
-window.addEventListener('keyup', () => {
-  console.log(timer.value)
-  if (timer.value) {
-    clearInterval(timer.value)
-    timer.value = null
-    return
-  }
 
-  timer.value = setInterval(() => {
-    people.value.scene.position.z += 0.1
-    people.value.scene.updateMatrix()
-    renderer.render(scene, camera)
-  }, 100)
-})
+// 键盘事件处理
+const moveSpeed = 0.1 // 移动速度
+let moveDirection = new THREE.Vector3() // 移动方向向量
+const keyState: any = {} // 记录按键状态
+
+function onKeyDown(event: any) {
+  keyState[event.code] = true
+}
+
+function onKeyUp(event: any) {
+  keyState[event.code] = false
+}
+
+window.addEventListener('keydown', onKeyDown, false)
+window.addEventListener('keyup', onKeyUp, false)
+
+// 渲染函数
+function animate() {
+  requestAnimationFrame(animate)
+
+  // 根据按键设置移动方向
+  moveDirection.set(0, 0, 0)
+  if (keyState['ArrowUp']) moveDirection.z -= 1
+  if (keyState['ArrowDown']) moveDirection.z += 1
+  if (keyState['ArrowLeft']) moveDirection.x -= 1
+  if (keyState['ArrowRight']) moveDirection.x += 1
+
+  // 归一化移动方向向量并乘以移动速度
+  moveDirection.normalize().multiplyScalar(moveSpeed)
+
+  // 移动模型
+  // console.log(people.value);
+  if (people.value) {
+    people.value.scene.position.add(moveDirection)
+  }
+  
+
+  // 渲染场景
+  renderer.render(scene, camera)
+}
+
+animate()
+
+// window.addEventListener('keyup', () => {
+//   console.log(timer.value)
+//   if (timer.value) {
+//     clearInterval(timer.value)
+//     timer.value = null
+//     return
+//   }
+
+//   timer.value = setInterval(() => {
+//     people.value.scene.position.z += 0.1
+//     people.value.scene.updateMatrix()
+//     renderer.render(scene, camera)
+//   }, 100)
+// })
 // 创建一个时钟对象Clock
 const clock = new THREE.Clock()
 function render() {
@@ -153,7 +198,7 @@ function render() {
     renderer.render(scene, camera)
   }
 }
-render()
+// render()
 </script>
 
 <style lang="scss">
