@@ -44,6 +44,12 @@ loader.load('sea_keep_lonely_watcher.glb', function (gltf: any) {
   tenement.value = gltf
   // 返回的场景对象gltf.scene插入到threejs场景中
   scene.add(gltf.scene)
+  // 计算包围盒
+  const bbox = new THREE.Box3().setFromObject(gltf.scene);
+  const size = new THREE.Vector3();
+  bbox.getSize(size);
+  console.log("模型的大小：", size.x, size.y, size.z);
+
   renderer.render(scene, camera)
 })
 
