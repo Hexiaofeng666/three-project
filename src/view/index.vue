@@ -9,17 +9,29 @@
         </div>
     </div>
     <div>
-        <dragon msg="You did it!" v-if="menus[0].show"/>
+        <dragon v-if="menus[0].show"/>
+        <sceneRoam v-if="menus[1].show"/>
+        <ball v-if="menus[2].show"/>
     </div>
 </template>
 <script setup lang="ts">
 
 import dragon from '../components/dragon.vue'
+import sceneRoam from '../components/sceneRoam.vue'
+import ball from '../components/ball.vue'
 import {ref} from 'vue'
 // import TheWelcome from './components/TheWelcome.vue'
 const showBack = ref(false)
 const menus = ref([{
-    name: 'dragon',
+    name: '动态小龙',
+    show: false
+},
+{
+    name: '场景漫游',
+    show: false
+},
+{
+    name: '球',
     show: false
 }])
 const back = ()=>{

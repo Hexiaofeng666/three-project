@@ -82,8 +82,8 @@ camera.position.set(30, 30, 30)
 camera.lookAt(0, 0, 0)
 
 //创建辅助坐标轴
-// const axesHelper = new THREE.AxesHelper(200) //参数200标示坐标系大小，可以根据场景大小去设置
-// scene.add(axesHelper)
+const axesHelper = new THREE.AxesHelper(200) //参数200标示坐标系大小，可以根据场景大小去设置
+scene.add(axesHelper)
 
 //创建一个WebGL渲染器
 const renderer = new THREE.WebGLRenderer()
@@ -100,6 +100,7 @@ controls.addEventListener('change', () => {
 
 let timer = ref()
 onMounted(() => {
+  console.log(renderer);
   document.getElementById('my-three')?.appendChild(renderer.domElement)
 })
 onBeforeUnmount(() => {
