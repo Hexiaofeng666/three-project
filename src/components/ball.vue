@@ -1,105 +1,146 @@
 <template>
-  <div ref="canvasWrapper"></div>
+  <div>
+    <div id="container" ref="canvas" />
+  </div>
 </template>
 
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+<script>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-const canvasWrapper = ref(null);
-let scene, camera, renderer, controls, cube;
+export default {
+  setup() {
+    const canvas = ref(null);
+    let mesh, camera, scene, renderer, firstPersonControls, clock;
 
-// 监听键盘事件
-const keyboardState = {};
+    const init = () => {
+      createScene();
+      loadObj();
+      createLight();
+      createCamera();
+      createRender();
+      createFlyControls();
+      render();
+    };
 
-const onKeyDown = (event) => {
-  keyboardState[event.code] = true;
+    // 创建场景
+    const createScene = () => {
+      scene = new THREE.Scene();
+    };
+
+    // 加载OBJ模型
+    const loadObj = () => {
+      const loader = new GLTFLoader()
+
+      loader.load(`sea_keep_lonely_watcher.glb`, (loadedMesh) => {
+        mesh = loadedMesh.scene;
+        loadedMesh.scene.position.set(0.2, 0.2, 0.2);
+        setRandomColors(loadedMesh);
+        scene.add(mesh);
+      });
+    };
+
+    const setRandomColors = (object) => {
+      const children = object.children;
+
+      if (children && children.length > 0) {
+        children.forEach(function (e) {
+          setRandomColors(e);
+        });
+      } else {
+        if (object instanceof THREE.Mesh) {
+          const colorIndex = Math.floor(Math.random() * 3); // 0~2的随机数
+          const colorArray = [
+            new THREE.Color(0xff0000),
+            new THREE.Color(0x00ff00),
+            new THREE.Color(0x0000ff),
+          ];
+          object.material.emissive = colorArray[colorIndex];
+          object.material.color = colorArray[colorIndex];
+          object.material.transparent = true;
+          object.material.opacity = 0.3;
+        }
+      }
+    };
+
+    // 创建光源
+    const createLight = () => {
+      // 环境光
+      const ambientLight = new THREE.AmbientLight(0x383838);
+      scene.add(ambientLight);
+
+      const spotLight = new THREE.SpotLight(0xffffff);
+      spotLight.position.set(200, 200, 200);
+      spotLight.castShadow = true;
+      scene.add(spotLight);
+    };
+
+    // 创建相机
+    const createCamera = () => {
+      const width = canvas.value.clientWidth;
+      const height = canvas.value.clientHeight;
+      const k = width / height;
+
+      camera = new THREE.PerspectiveCamera(35, k, 0.1, 1000);
+      camera.position.set(-45, 60, 457)
+camera.lookAt(0, 60, 0)
+      scene.add(camera);
+    };
+
+    // 创建渲染器
+    const createRender = () => {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(canvas.value.clientWidth, canvas.value.clientHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.setClearColor(0x3f3f3f, 1);
+      canvas.value.appendChild(renderer.domElement);
+    };
+
+    // 渲染
+    const render = () => {
+      const delta = clock.getDelta();
+      firstPersonControls.update(delta);
+      renderer.render(scene, camera);
+      requestAnimationFrame(render);
+    };
+
+    // 创建第一人称控件
+    const createFlyControls = () => {
+      clock = new THREE.Clock();
+      firstPersonControls = new FirstPersonControls(camera, renderer.domElement);
+      firstPersonControls.lookSpeed = 0.1;
+      firstPersonControls.movementSpeed = 20;
+      firstPersonControls.noFly = true;
+      firstPersonControls.lookVertical = true;
+      firstPersonControls.constrainVertical = true;
+      firstPersonControls.verticalMin = 1.0;
+      firstPersonControls.verticalMax = 2.0;
+      firstPersonControls.lon = -150;
+      firstPersonControls.lat = 120;
+    };
+
+    onMounted(() => {
+      init();
+    });
+
+    onBeforeUnmount(() => {
+      renderer.dispose();
+    });
+
+    return {
+      canvas,
+    };
+  },
 };
-
-const onKeyUp = (event) => {
-  keyboardState[event.code] = false;
-};
-
-// 初始化场景、相机、渲染器和控制器
-onMounted(() => {
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  canvasWrapper.value.appendChild(renderer.domElement);
-
-  // 添加灯光
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-  scene.add(ambientLight);
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-  scene.add(directionalLight);
-
-  // 添加立方体模型
-  const geometry = new THREE.BoxGeometry();
-  const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-  cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
-
-  // 设置相机初始位置和朝向
-  camera.position.set(5, 5, 5);
-  camera.lookAt(scene.position);
-
-  // 添加轨道控制器
-  controls = new OrbitControls(camera, renderer.domElement);
-
-  // 监听键盘事件
-  document.addEventListener('keydown', onKeyDown);
-  document.addEventListener('keyup', onKeyUp);
-
-  // 渲染场景
-  const animate = () => {
-    requestAnimationFrame(animate);
-
-    // 根据键盘事件更新相机位置
-    const step = 0.1; // 相机移动的步长
-
-    // 根据相机的朝向来计算移动方向
-    const cameraDirection = new THREE.Vector3();
-    camera.getWorldDirection(cameraDirection);
-
-    // 向前后移动
-    if (keyboardState['ArrowUp']) {
-      camera.position.add(cameraDirection.multiplyScalar(-step)); // 向前移动
-    }
-    if (keyboardState['ArrowDown']) {
-      camera.position.add(cameraDirection.multiplyScalar(step)); // 向后移动
-    }
-
-    // 向左右移动，忽略y轴方向
-    const cameraRight = new THREE.Vector3();
-    cameraRight.crossVectors(cameraDirection, camera.up).normalize();
-    const cameraUp = new THREE.Vector3(0, 1, 0);
-    cameraUp.applyQuaternion(camera.quaternion);
-    const cameraForward = new THREE.Vector3().crossVectors(cameraRight, cameraUp).normalize();
-
-    if (keyboardState['ArrowLeft']) {
-      camera.position.add(cameraRight.multiplyScalar(-step)); // 向左移动
-    }
-    if (keyboardState['ArrowRight']) {
-      camera.position.add(cameraRight.multiplyScalar(step)); // 向右移动
-    }
-
-    controls.update();
-    renderer.render(scene, camera);
-  };
-
-  animate();
-});
-
-// 在组件销毁时移除事件监听
-onUnmounted(() => {
-  document.removeEventListener('keydown', onKeyDown);
-  document.removeEventListener('keyup', onKeyUp);
-});
 </script>
 
 <style>
-body { margin: 0; overflow: hidden; }
-canvas { display: block; }
+#container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
 </style>

@@ -5,18 +5,18 @@
 <script lang="ts" setup>
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-
+import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { onMounted, ref } from 'vue'
 
 const scene = new THREE.Scene()
 
 const loader = new GLTFLoader()
-// loader.load('sea_keep_lonely_watcher.glb',(gltf: any)=>{
-//     gltf.scene.position.set(0,0,0)
-//     scene.add(gltf.scene)
-//     renderer.render(scene,camera)
-// })
+loader.load('sea_keep_lonely_watcher.glb', (gltf: any) => {
+    gltf.scene.position.set(0, 0, 0)
+    scene.add(gltf.scene)
+    renderer.render(scene, camera)
+})
 
 
 
@@ -49,10 +49,20 @@ renderer.setClearColor(0xffffff, 1) // 设置背景颜色为白色
 renderer.render(scene, camera)
 
 // 添加轨道控制器
-const controls = new OrbitControls(camera, renderer.domElement) //创建控件对象
+// const controls = new OrbitControls(camera, renderer.domElement) //创建控件对象
+// controls.addEventListener('change', () => {
+//     console.log(camera);
+
+//     renderer.render(scene, camera) //监听鼠标，键盘事件
+// })
+
+// 创建FirstPersonControls
+const controls = new FirstPersonControls(camera, renderer.domElement);
+controls.movementSpeed = 0.1;
+controls.lookSpeed = 0.1;
 controls.addEventListener('change', () => {
     console.log(camera);
-    
+
     renderer.render(scene, camera) //监听鼠标，键盘事件
 })
 
