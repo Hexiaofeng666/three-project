@@ -54,9 +54,9 @@ loader.load('black_dragon_with_idle_animation.glb', function (gltf: any) {
     const frameT = clock.getDelta()
     // 更新播放器相关的时间
     mixer.update(frameT)
+    renderer.render(scene, camera)
   }
   loop()
-  renderer.render(scene, camera)
   // render()
 })
 
@@ -152,17 +152,17 @@ function animate() {
 animate()
 
 // 创建一个时钟对象Clock
-const clock = new THREE.Clock()
-function render() {
-  requestAnimationFrame(render)
-  //  console.log(mixer);
-  if (mixer !== null) {
-    //clock.getDelta()方法获得两帧的时间间隔
-    // 更新播放器相关的时间
-    mixer.update(clock.getDelta())
-    renderer.render(scene, camera)
-  }
-}
+// const clock = new THREE.Clock()
+// function render() {
+//   requestAnimationFrame(render)
+//   //  console.log(mixer);
+//   if (mixer !== null) {
+//     //clock.getDelta()方法获得两帧的时间间隔
+//     // 更新播放器相关的时间
+//     mixer.update(clock.getDelta())
+//     renderer.render(scene, camera)
+//   }
+// }
 // render()
 </script>
 

@@ -7,7 +7,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onBeforeUnmount } from 'vue'
 
 const scene = new THREE.Scene()
 
@@ -60,11 +60,11 @@ renderer.render(scene, camera)
 const controls = new FirstPersonControls(camera, renderer.domElement);
 controls.movementSpeed = 0.1;
 controls.lookSpeed = 0.1;
-controls.addEventListener('change', () => {
-    console.log(camera);
+// controls.addEventListener('change', () => {
+//     console.log(camera);
 
-    renderer.render(scene, camera) //监听鼠标，键盘事件
-})
+//     renderer.render(scene, camera) //监听鼠标，键盘事件
+// })
 
 const moveSpeed = 0.1 // 移动速度
 function onKeyDown(event: any) {
@@ -97,9 +97,22 @@ function onKeyDown(event: any) {
 // 监听键盘事件
 window.addEventListener('keydown', onKeyDown)
 
+// 渲染
+const clock = new THREE.Clock()
+const render = () => {
+        const delta = clock.getDelta();
+        controls.update(delta)
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      };
+
 const box = ref()
 onMounted(() => {
     box.value?.appendChild(renderer.domElement)
+    render()
     //   document.getElementById('my-three')?.appendChild(renderer.domElement)
 })
+onBeforeUnmount(() => {
+        renderer.dispose();
+      });
 </script>

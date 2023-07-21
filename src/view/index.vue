@@ -8,10 +8,11 @@
             </div>
         </div>
     </div>
-    <div>
+    <div class="container">
         <dragon v-if="menus[0].show"/>
         <sceneRoam v-if="menus[1].show"/>
         <ball v-if="menus[2].show"/>
+        <shakeHead v-if="menus[3].show"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -19,6 +20,7 @@
 import dragon from '../components/dragon.vue'
 import sceneRoam from '../components/sceneRoam.vue'
 import ball from '../components/ball.vue'
+import shakeHead from '../components/shakeHead.vue'
 import {ref} from 'vue'
 // import TheWelcome from './components/TheWelcome.vue'
 const showBack = ref(false)
@@ -33,14 +35,19 @@ const menus = ref([{
 {
     name: '球',
     show: false
-}])
+},
+{
+    name: '摇头',
+    show: false
+},
+])
 const back = ()=>{
     showBack.value=false
     menus.value.forEach(el => {
         el.show = false
     });
 }
-const show = (menu)=>{
+const show = (menu: any)=>{
     menu.show = true
     showBack.value=true
 }
@@ -51,5 +58,11 @@ const show = (menu)=>{
     position: fixed;
     left: 20px;
     top: 20px;
+    z-index: 99;
+}
+.container{
+    /* position: fixed; */
+    width: 100%;
+    height: 100%;
 }
 </style>
