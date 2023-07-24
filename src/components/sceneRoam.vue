@@ -53,7 +53,7 @@ renderer.domElement.addEventListener('click', function () {
 });
 
 controls.addEventListener('lock', function () {
-    camera.position.set(-45, 600, 457)
+    // camera.position.set(-45, 600, 457)
     // renderer.domElement.style.display = 'none';
 });
 
@@ -148,7 +148,7 @@ const time = performance.now();
 if ( controls.isLocked === true ) {
 
     raycaster.ray.origin.copy( controls.getObject().position );
-    raycaster.ray.origin.y -= 10;
+    // raycaster.ray.origin.y -= 10;
 
     const intersections = raycaster.intersectObjects( objects, false );
 
@@ -180,10 +180,10 @@ if ( controls.isLocked === true ) {
 
     controls.getObject().position.y += ( velocity.y * delta ); // new behavior
 
-    if ( controls.getObject().position.y < 10 ) {
+    if ( controls.getObject().position.y < 60 ) {
 
         velocity.y = 0;
-        controls.getObject().position.y = 10;
+        controls.getObject().position.y = 60;
 
         canJump = true;
 
