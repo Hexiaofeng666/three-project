@@ -13,11 +13,6 @@ import { onMounted, ref, onBeforeUnmount } from 'vue'
 const scene = new THREE.Scene()
 
 const loader = new GLTFLoader()
-loader.load('sea_keep_lonely_watcher.glb', (gltf: any) => {
-    gltf.scene.position.set(0, 0, 0)
-    scene.add(gltf.scene)
-    renderer.render(scene, camera)
-})
 
 
 
@@ -29,15 +24,31 @@ const width = window.innerWidth
 const height = window.innerHeight
 //创建一个透视相机，窗口宽度，窗口高度
 const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000)
-camera.position.set(-45, 600, 457)
-camera.lookAt(0, 60, 0)
-console.log(camera);
+// camera.position.set(-45, 600, 457)
+camera.position.set(0, 3, 0)
+camera.lookAt(0, 3, 0)
 
+let boxModel: any
+let scale = 0
+loader.load('ccity_building_set_1.glb', (gltf: any) => {
+    const box = boxModel = new THREE.Box3().setFromObject(gltf.scene)
+    const x = (box.max.x - box.min.x)
+    const y = (box.max.y - box.min.y)
+    const z = (box.max.z - box.min.z)
+    const maxDim = Math.max(x, y, z)
+    scale = width / maxDim
+    gltf.scene.scale.set(scale, scale, scale)
+
+
+    gltf.scene.position.set(0, 0, 0)
+    scene.add(gltf.scene)
+    renderer.render(scene, camera)
+})
 
 
 //创建辅助坐标轴
-// const axesHelper = new THREE.AxesHelper(200) //参数200标示坐标系大小，可以根据场景大小去设置
-// scene.add(axesHelper)
+const axesHelper = new THREE.AxesHelper(200) //参数200标示坐标系大小，可以根据场景大小去设置
+scene.add(axesHelper)
 
 
 const renderer = new THREE.WebGLRenderer()
@@ -52,10 +63,9 @@ renderer.domElement.addEventListener('click', function () {
     controls.lock();
 });
 
-controls.addEventListener('lock', function () {
-    // camera.position.set(-45, 600, 457)
-    // renderer.domElement.style.display = 'none';
-});
+// controls.addEventListener('lock', function () {
+//     renderer.domElement.style.display = 'none';
+// });
 
 // controls.addEventListener('unlock', function () {
 //     renderer.domElement.style.display = '';
@@ -95,7 +105,7 @@ const onKeyDown = function (event: { code: any; }) {
             break;
 
         case 'Space':
-            if (canJump === true) velocity.y += 350;
+            if (canJump === true) velocity.y += 50;
             canJump = false;
             break;
 
@@ -136,64 +146,89 @@ document.addEventListener('keyup', onKeyUp);
 
 // 渲染
 const clock = new THREE.Clock()
-let raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+let raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, - 1, 0), 0, 10);
 let objects: never[] = [];
 let prevTime = performance.now();
 function render() {
 
-requestAnimationFrame( render );
+    requestAnimationFrame(render);
 
-const time = performance.now();
+    const time = performance.now();
 
-if ( controls.isLocked === true ) {
+    if (controls.isLocked === true) {
 
-    raycaster.ray.origin.copy( controls.getObject().position );
-    // raycaster.ray.origin.y -= 10;
+        raycaster.ray.origin.copy(controls.getObject().position);
+        // raycaster.ray.origin.y -= 10;
 
-    const intersections = raycaster.intersectObjects( objects, false );
+        const intersections = raycaster.intersectObjects(objects, false);
 
-    const onObject = intersections.length > 0;
+        const onObject = intersections.length > 0;
 
-    const delta = ( time - prevTime ) / 1000;
+        const delta = (time - prevTime) / 1000;
 
-    velocity.x -= velocity.x * 10.0 * delta;
-    velocity.z -= velocity.z * 10.0 * delta;
+        velocity.x -= velocity.x * 10.0 * delta;
+        velocity.z -= velocity.z * 10.0 * delta;
 
-    velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+        velocity.y -= 9.8 * 10.0 * delta; // 100.0 = mass
 
-    direction.z = Number( moveForward ) - Number( moveBackward );
-    direction.x = Number( moveRight ) - Number( moveLeft );
-    direction.normalize(); // this ensures consistent movements in all directions
+        direction.z = Number(moveForward) - Number(moveBackward);
+        direction.x = Number(moveRight) - Number(moveLeft);
 
-    if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-    if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
+        direction.normalize(); // this ensures consistent movements in all directions
 
-    if ( onObject === true ) {
+        if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
+        if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
 
-        velocity.y = Math.max( 0, velocity.y );
-        canJump = true;
+        if (onObject === true) {
+
+            velocity.y = Math.max(0, velocity.y);
+            canJump = true;
+
+        }
+
+        // 边境检测
+        if ((controls.getObject().position.x < boxModel.min.x * scale) || (controls.getObject().position.x > boxModel.max.x * scale)) {
+            const distanceToMax = Math.abs(boxModel.max.x * scale - controls.getObject().position.x);
+            const distanceToMin = Math.abs(controls.getObject().position.x - boxModel.min.x * scale);
+
+            if (distanceToMax < distanceToMin) {
+                controls.getObject().position.x = boxModel.max.x* scale
+            } else {
+                controls.getObject().position.x = boxModel.min.x* scale
+            }
+            return
+        }
+
+        if ((controls.getObject().position.z < boxModel.min.z * scale) || (controls.getObject().position.z > boxModel.max.z * scale)) {
+            const distanceToMax = Math.abs(boxModel.max.z * scale - controls.getObject().position.z);
+            const distanceToMin = Math.abs(controls.getObject().position.z - boxModel.min.z * scale);
+
+            if (distanceToMax < distanceToMin) {
+                controls.getObject().position.z = boxModel.max.z* scale
+            } else {
+                controls.getObject().position.z = boxModel.min.z* scale
+            }
+            return
+        }
+        controls.moveRight(- velocity.x * delta);
+        controls.moveForward(- velocity.z * delta);
+
+        controls.getObject().position.y += (velocity.y * delta); // new behavior
+
+        if (controls.getObject().position.y < 3) {
+
+            velocity.y = 0;
+            controls.getObject().position.y = 3;
+
+            canJump = true;
+
+        }
 
     }
 
-    controls.moveRight( - velocity.x * delta );
-    controls.moveForward( - velocity.z * delta );
+    prevTime = time;
 
-    controls.getObject().position.y += ( velocity.y * delta ); // new behavior
-
-    if ( controls.getObject().position.y < 60 ) {
-
-        velocity.y = 0;
-        controls.getObject().position.y = 60;
-
-        canJump = true;
-
-    }
-
-}
-
-prevTime = time;
-
-renderer.render( scene, camera );
+    renderer.render(scene, camera);
 
 }
 
