@@ -11,16 +11,16 @@
     <div class="container">
         <dragon v-if="menus[0].show"/>
         <sceneRoam v-if="menus[1].show"/>
-        <ball v-if="menus[2].show"/>
-        <shakeHead v-if="menus[3].show"/>
+        <rotating-cube v-if="menus[2].show"/>
+        <ball v-if="menus[3].show"/>
     </div>
 </template>
 <script setup lang="ts">
 
 import dragon from '../components/dragon.vue'
 import sceneRoam from '../components/sceneRoam.vue'
+import rotatingCube from '../components/rotatingCube.vue'
 import ball from '../components/ball.vue'
-import shakeHead from '../components/shakeHead.vue'
 import {ref} from 'vue'
 // import TheWelcome from './components/TheWelcome.vue'
 const showBack = ref(false)
@@ -33,11 +33,11 @@ const menus = ref([{
     show: false
 },
 {
-    name: '球',
+    name: '旋转的正方体',
     show: false
 },
 {
-    name: '摇头',
+    name: '球',
     show: false
 },
 ])
