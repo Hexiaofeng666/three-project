@@ -13,6 +13,7 @@
         <sceneRoam v-if="menus[1].show"/>
         <rotating-cube v-if="menus[2].show"/>
         <ball v-if="menus[3].show"/>
+        <words v-if="menus[4].show"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -21,6 +22,7 @@ import dragon from '../components/dragon.vue'
 import sceneRoam from '../components/sceneRoam.vue'
 import rotatingCube from '../components/rotatingCube.vue'
 import ball from '../components/ball.vue'
+import words from '../components/words.vue'
 import {ref} from 'vue'
 // import TheWelcome from './components/TheWelcome.vue'
 const showBack = ref(false)
@@ -38,6 +40,10 @@ const menus = ref([{
 },
 {
     name: '球',
+    show: false
+},
+{
+    name: '文字',
     show: false
 },
 ])

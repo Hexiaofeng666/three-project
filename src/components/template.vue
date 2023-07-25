@@ -13,7 +13,7 @@
   
   //添加光源 //会照亮场景里的全部物体（氛围灯），前提是物体是可以接受灯光的，这种灯是无方向的，即不会有阴影。
   const ambient = new THREE.AmbientLight(0xffffff, 0.4)
-  const light = new THREE.PointLight(0xffffff, 1) //点光源，color:灯光颜色，intensity:光照强度
+  scene.add(ambient)
   
   //创建一个透视相机，窗口宽度，窗口高度
   const width = window.innerWidth,

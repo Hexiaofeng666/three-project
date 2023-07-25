@@ -1,31 +1,53 @@
 <template>
-    <div id="my-three"></div>
+  <div id="my-three"></div>
 </template>
   
 <script lang="ts" setup>
+// 模板
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 //创建一个三维场景
 const scene = new THREE.Scene()
+
+const materials = [
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+					new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+				];
+
+const loader = new FontLoader();
+loader.load(
+  // 资源URL
+  'fonts/fonts.json',
+  function (font: any) {
+    const geometry = new TextGeometry('Hello three.js!', {
+      font: font,
+      size: 80,
+      height: 5,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 10,
+      bevelSize: 8,
+      bevelSegments: 5
+    });
+    geometry.computeBoundingBox();
+    const textMesh1 = new THREE.Mesh( geometry, materials );
+    const group = new THREE.Group(); 
+    group.add( textMesh1 );
+    scene.add(group)
+  }
+);
 
 
 //添加光源 //会照亮场景里的全部物体（氛围灯），前提是物体是可以接受灯光的，这种灯是无方向的，即不会有阴影。
 const ambient = new THREE.AmbientLight(0xffffff, 0.4)
 scene.add(ambient)
 
-// 创建几何体
-const cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-// 创建材质
-const cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
-// 根据几何体和材质创建物体(网格)
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-cube.rotateX(Math.PI/4); // 围绕全局X轴旋转
-scene.add(cube)
-
 //创建一个透视相机，窗口宽度，窗口高度
 const width = window.innerWidth,
-    height = window.innerHeight
+  height = window.innerHeight
 const camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000)
 //设置相机位置
 camera.position.set(30, 30, 30)
@@ -44,26 +66,27 @@ renderer.render(scene, camera) //执行渲染操作、指定场景、相机作�
 
 const controls = new OrbitControls(camera, renderer.domElement) //创建控件对象
 controls.addEventListener('change', () => {
-    renderer.render(scene, camera) //监听鼠标，键盘事件
+  // console.log('change');
+
+  renderer.render(scene, camera) //监听鼠标，键盘事件
 })
 
 let timer = ref()
 onMounted(() => {
-    document.getElementById('my-three')?.appendChild(renderer.domElement)
+  console.log(renderer);
+  document.getElementById('my-three')?.appendChild(renderer.domElement)
 })
 onBeforeUnmount(() => {
-    clearInterval(timer.value)
+  clearInterval(timer.value)
 })
 
 // 渲染函数
 function animate() {
-    requestAnimationFrame(animate)
-    cube.rotation.y += Math.PI*0.01
-    if (cube.rotation.y > Math.PI) {
-        cube.rotation.y = 0;
-    }
-    // 渲染场景
-    renderer.render(scene, camera)
+  requestAnimationFrame(animate)
+
+
+  // 渲染场景
+  renderer.render(scene, camera)
 }
 
 animate()
@@ -71,14 +94,14 @@ animate()
   
 <style lang="scss">
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #my-three {
-    // width: 300px;
-    // height: 300px;
-    // overflow: hidden;
+  // width: 300px;
+  // height: 300px;
+  // overflow: hidden;
 }
 </style>
   
