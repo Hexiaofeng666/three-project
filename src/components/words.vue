@@ -13,8 +13,8 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 const scene = new THREE.Scene()
 
 const materials = [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-					new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+					new THREE.MeshPhongMaterial( { color: 0xF8A5B8, flatShading: true } ), // front
+					new THREE.MeshPhongMaterial( { color: 0x7C997A } ) // side
 				];
 
 const loader = new FontLoader();
@@ -24,7 +24,7 @@ loader.load(
   function (font: any) {
     const geometry = new TextGeometry('Hello three.js!', {
       font: font,
-      size: 80,
+      size: 120,
       height: 5,
       curveSegments: 12,
       bevelEnabled: true,
@@ -48,15 +48,15 @@ scene.add(ambient)
 //创建一个透视相机，窗口宽度，窗口高度
 const width = window.innerWidth,
   height = window.innerHeight
-const camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000)
+const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000)
 //设置相机位置
-camera.position.set(30, 30, 30)
+camera.position.set(3000, 30, 3000)
 //设置相机方向
-camera.lookAt(0, 0, 0)
+camera.lookAt(3000, 30, 0)
 
 //创建辅助坐标轴
-const axesHelper = new THREE.AxesHelper(200) //参数200标示坐标系大小，可以根据场景大小去设置
-scene.add(axesHelper)
+// const axesHelper = new THREE.AxesHelper(200) //参数200标示坐标系大小，可以根据场景大小去设置
+// scene.add(axesHelper)
 
 //创建一个WebGL渲染器
 const renderer = new THREE.WebGLRenderer()
