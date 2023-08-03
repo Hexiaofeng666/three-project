@@ -34,6 +34,8 @@ loader.load(
     });
     geometry.computeBoundingBox();
     const textMesh1 = new THREE.Mesh( geometry, materials );
+    console.log(textMesh1);
+    textMesh1.position.set(-500, 30, 0)
     const group = new THREE.Group(); 
     group.add( textMesh1 );
     scene.add(group)

@@ -174,7 +174,7 @@ function render() {
         direction.z = Number(moveForward) - Number(moveBackward);
         direction.x = Number(moveRight) - Number(moveLeft);
 
-        direction.normalize(); // this ensures consistent movements in all directions
+        direction.normalize(); // 确保了所有方向的一致运动
 
         if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
         if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;

@@ -14,6 +14,8 @@
         <rotating-cube v-if="menus[2].show"/>
         <ball v-if="menus[3].show"/>
         <words v-if="menus[4].show"/>
+        <gallery v-if="menus[5].show"/>
+        <vedio v-if="menus[6].show"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -23,6 +25,8 @@ import sceneRoam from '../components/sceneRoam.vue'
 import rotatingCube from '../components/rotatingCube.vue'
 import ball from '../components/ball.vue'
 import words from '../components/words.vue'
+import gallery from '../components/gallery.vue'
+import vedio from '../components/vedio.vue'
 import {ref} from 'vue'
 // import TheWelcome from './components/TheWelcome.vue'
 const showBack = ref(false)
@@ -39,11 +43,19 @@ const menus = ref([{
     show: false
 },
 {
-    name: '球',
+    name: '自由落体',
     show: false
 },
 {
     name: '文字',
+    show: false
+},
+{
+    name: '画廊',
+    show: false
+},
+{
+    name: '音频',
     show: false
 },
 ])
